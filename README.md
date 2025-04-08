@@ -1,78 +1,106 @@
-# Shopify App Template - Extension only
+# ✅ Shopify Checkout Confidence Builder App
 
-This is a template for building an [extension-only Shopify app](https://shopify.dev/docs/apps/build/app-extensions/build-extension-only-app). It contains the basics for building a Shopify app that uses only app extensions.
+This app displays a customizable banner image during the checkout process to increase customer trust and improve conversion rates. The banner can be configured via the theme editor, including image URL, alt text, width, alignment, and visibility based on checkout steps.
 
-This template doesn't include a server or the ability to embed a page in the Shopify Admin. If you want either of these capabilities, choose the [Remix app template](https://github.com/Shopify/shopify-app-template-remix) instead.
+You will need to setup the app using Shopify CLI
 
-Whether you choose to use this template or another one, you can use your preferred package manager and the Shopify CLI with [these steps](#installing-the-template).
+---
 
-## Benefits
+## 🛠️ Extension Configuration (Shopify `shopify.extension.toml`)
 
-Shopify apps are built on a variety of Shopify tools to create a great merchant experience. The [create an app](https://shopify.dev/docs/apps/getting-started/create) tutorial in our developer documentation will guide you through creating a Shopify app.
+```toml
+name = "checkoutbanner"
+type = "checkout_ui_extension"
+api_version = "2025-01"
 
-This app template does little more than install the CLI and scaffold a repository.
+[[extensions]]
+name = "checkoutbanner"
+handle = "checkoutbanner"
+type = "ui_extension"
 
-## Getting started
+[[extensions.targeting]]
+module = "./src/Checkout.jsx"
+target = "purchase.checkout.block.render"
 
-### Requirements
+[extensions.capabilities]
+api_access = true
 
-1. You must [download and install Node.js](https://nodejs.org/en/download/) if you don't already have it.
-1. You must [create a Shopify partner account](https://partners.shopify.com/signup) if you don’t have one.
-1. You must create a store for testing if you don't have one, either a [development store](https://help.shopify.com/en/partners/dashboard/development-stores#create-a-development-store) or a [Shopify Plus sandbox store](https://help.shopify.com/en/partners/dashboard/managing-stores/plus-sandbox-store).
+[extensions.settings]
 
-### Installing the template
+# 🖼️ Image URL (merchant must paste a full image URL)
+[[extensions.settings.fields]]
+key = "bannerImage"
+type = "single_line_text_field"
+name = "Checkout banner image URL"
+description = "Paste the full image URL to display at checkout"
 
-This template can be installed using your preferred package manager:
+# 📝 Alt Text for Accessibility
+[[extensions.settings.fields]]
+key = "bannerAlt"
+type = "single_line_text_field"
+name = "Image alt text"
+description = "Accessibility text for screen readers"
 
-Using yarn:
+# 📏 Max Width (pixels)
+[[extensions.settings.fields]]
+key = "maxWidth"
+type = "number_integer"
+name = "Max Width (px)"
+description = "Optional: Set a maximum image width"
 
-```shell
-yarn create @shopify/app
+# 🧭 Alignment
+[[extensions.settings.fields]]
+key = "alignment"
+type = "single_line_text_field"
+name = "Banner alignment"
+description = "Type left, center, or right"
+
+# 🔀 Checkout Step Visibility
+[[extensions.settings.fields]]
+key = "showOnStep"
+type = "single_line_text_field"
+name = "Show on checkout step"
+description = "Type all, information, shipping, or payment"
 ```
 
-Using npm:
+---
 
-```shell
-npm init @shopify/app@latest
+## ⚛️ React Extension Component (`src/Checkout.jsx`)
+
+```jsx
+import {
+  reactExtension,
+  useSettings,
+  Image
+} from "@shopify/ui-extensions-react/checkout";
+
+export default reactExtension('purchase.checkout.block.render', () => <CheckoutBanner />);
+
+function CheckoutBanner() {
+  const { bannerImage } = useSettings();
+
+  if (!bannerImage) return null;
+
+  return <Image source={bannerImage} description="Checkout banner image" />;
+}
 ```
 
-Using pnpm:
+---
 
-```shell
-pnpm create @shopify/app@latest
-```
+## ✨ Features
 
-This will clone the template and install the required dependencies.
+- Upload a banner image via settings
+- Custom alt text for accessibility
+- Optional max-width for responsive design
+- Align the image left, center, or right
+- Choose which checkout step(s) to display the banner on
 
-#### Local Development
+---
 
-[The Shopify CLI](https://shopify.dev/docs/apps/tools/cli) connects to an app in your Partners dashboard. It provides environment variables and runs commands in parallel.
+## ✅ Use Cases
 
-You can develop locally using your preferred package manager. Run one of the following commands from the root of your app.
+- Build trust with security badges
+- Reassure with return policy highlights
+- Promote seasonal offers or guarantees
 
-Using yarn:
-
-```shell
-yarn dev
-```
-
-Using npm:
-
-```shell
-npm run dev
-```
-
-Using pnpm:
-
-```shell
-pnpm run dev
-```
-
-Open the URL generated in your console. Once you grant permission to the app, you can start development (such as generating extensions).
-
-## Developer resources
-
-- [Introduction to Shopify apps](https://shopify.dev/docs/apps/getting-started)
-- [App extensions](https://shopify.dev/docs/apps/build/app-extensions)
-- [Extension only apps](https://shopify.dev/docs/apps/build/app-extensions/build-extension-only-app)
-- [Shopify CLI](https://shopify.dev/docs/apps/tools/cli)
+Let me know if you want to expand this app with text blocks, CTA buttons, or dynamic messages based on the cart!
